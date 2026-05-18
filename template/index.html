@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Monitor & Counter</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f9; text-align: center; padding: 50px; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        h1 { color: #333; }
+        .counter-box { font-size: 50px; font-weight: bold; color: #007bff; margin: 20px 0; }
+        button { padding: 10px 20px; font-size: 20px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 5px; }
+        button:hover { background: #218838; }
+        
+        /* Bagian Monitoring */
+        .monitoring { margin-top: 30px; text-align: left; border-top: 1px solid #eee; padding-top: 20px; }
+        .stat-row { display: flex; justify-content: space-between; margin: 5px 0; }
+        .label { font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Project Docker Sederhana</h1>
+    
+    <div class="counter-box">
+        Nilai: {{ count }}
+    </div>
+    
+    <button onclick="tambahCounter()">KLIK SAYA (+1)</button>
+
+    <div class="monitoring">
+        <h3>Status Server (Dinamis)</h3>
+        <div class="stat-row"><span class="label">CPU Load:</span> <span id="cpu-val">0</span>%</div>
+        <div class="stat-row"><span class="label">RAM Usage:</span> <span id="ram-val">0</span>%</div>
+    </div>
+</div>
+
+<script>
+    // Fungsi JavaScript untuk tombol tambah
+    function tambahCounter() {
+        fetch('/add', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('.counter-box').innerText = 'Nilai: ' + data.count;
+            });
+    }
+
+    // Fungsi Auto Refresh (Monitoring)
+    setInterval(() => {
+        fetch('/stats')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('cpu-val').innerText = data.cpu;
+                document.getElementById('ram-val').innerText = data.ram;
+            });
+    }, 1000); // Update setiap 1 detik
+</script>
+
+</body>
+</html>
